@@ -17,9 +17,13 @@ pub enum Direction {
 }
 
 pub trait Impl {
+    /// map virt address to physical address
     fn map(addr: NonNull<u8>, size: usize, direction: Direction) -> u64;
+    /// unmap virt address
     fn unmap(addr: NonNull<u8>, size: usize);
+    /// write cache back to memory
     fn flush(addr: NonNull<u8>, size: usize);
+    /// invalidate cache
     fn invalidate(addr: NonNull<u8>, size: usize);
 }
 
@@ -33,12 +37,15 @@ extern "Rust" {
 fn map(addr: NonNull<u8>, size: usize, direction: Direction) -> u64 {
     unsafe { __dma_api_map(addr, size, direction) }
 }
+
 fn unmap(addr: NonNull<u8>, size: usize) {
     unsafe { __dma_api_unmap(addr, size) }
 }
+
 fn flush(addr: NonNull<u8>, size: usize) {
     unsafe { __dma_api_flush(addr, size) }
 }
+
 fn invalidate(addr: NonNull<u8>, size: usize) {
     unsafe { __dma_api_invalidate(addr, size) }
 }

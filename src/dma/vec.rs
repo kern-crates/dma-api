@@ -1,6 +1,6 @@
-use core::{alloc::Layout, ptr::NonNull};
+use core::alloc::Layout;
 
-use crate::{flush, invalidate, map, unmap, Direction};
+use crate::Direction;
 
 use super::DmaCommon;
 
