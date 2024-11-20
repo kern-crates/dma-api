@@ -5,14 +5,14 @@ use crate::{flush, invalidate, map, unmap, Direction};
 pub mod r#box;
 pub mod vec;
 
-struct DmaCommon<T> {
+struct DCommon<T> {
     addr: NonNull<T>,
     bus_addr: u64,
     layout: Layout,
     direction: Direction,
 }
 
-impl<T> DmaCommon<T> {
+impl<T> DCommon<T> {
     pub fn zeros(layout: Layout, direction: Direction) -> Option<Self> {
         unsafe {
             let addr = NonNull::new(alloc::alloc::alloc_zeroed(layout))?;
@@ -45,7 +45,7 @@ impl<T> DmaCommon<T> {
     }
 }
 
-impl<T> Drop for DmaCommon<T> {
+impl<T> Drop for DCommon<T> {
     fn drop(&mut self) {
         unmap(self.addr.cast(), self.layout.size());
 

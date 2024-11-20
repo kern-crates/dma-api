@@ -2,10 +2,10 @@ use core::alloc::Layout;
 
 use crate::Direction;
 
-use super::DmaCommon;
+use super::DCommon;
 
 pub struct DVec<T> {
-    inner: DmaCommon<T>,
+    inner: DCommon<T>,
 }
 
 impl<T> DVec<T> {
@@ -14,7 +14,7 @@ impl<T> DVec<T> {
         let layout = Layout::from_size_align(size, align).unwrap();
 
         Some(Self {
-            inner: DmaCommon::zeros(layout, direction)?,
+            inner: DCommon::zeros(layout, direction)?,
         })
     }
     pub fn len(&self) -> usize {

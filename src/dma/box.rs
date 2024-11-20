@@ -2,10 +2,10 @@ use core::alloc::Layout;
 
 use crate::Direction;
 
-use super::DmaCommon;
+use super::DCommon;
 
 pub struct DBox<T> {
-    inner: DmaCommon<T>,
+    inner: DCommon<T>,
 }
 
 impl<T> DBox<T> {
@@ -13,7 +13,7 @@ impl<T> DBox<T> {
         let layout = Layout::new::<T>();
 
         Some(Self {
-            inner: DmaCommon::zeros(layout, direction)?,
+            inner: DCommon::zeros(layout, direction)?,
         })
     }
     pub fn bus_addr(&self) -> u64 {
