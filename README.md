@@ -1,7 +1,5 @@
 # DMA API
 
-DMA 创建和管理库
-
 ## Driver Example
 
 ```rust
@@ -18,7 +16,7 @@ let o = dma.get(0).unwrap();
 assert_eq!(o, 1);
 ```
 
-### OS Example
+## OS Example
 
 ```rust
 use dma_api::*;
