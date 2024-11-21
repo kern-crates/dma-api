@@ -1,9 +1,13 @@
 # DMA API
 
-## Driver Example
+[![Rust](https://github.com/ZR233/dma-api/actions/workflows/rust.yml/badge.svg?branch=main)](https://github.com/ZR233/dma-api/actions/workflows/rust.yml)
+
+## Example
 
 ```rust
 use dma_api::*;
+
+// ----- Driver Side -----
 
 // use global allocator to alloc `to device` type memory
 let mut dma: DVec<u32> = DVec::zeros(10, 0x1000, Direction::ToDevice).unwrap();
@@ -14,12 +18,9 @@ dma.set(0, 1);
 let o = dma.get(0).unwrap();
 
 assert_eq!(o, 1);
-```
 
-## OS Example
 
-```rust
-use dma_api::*;
+// ----- OS Side -----
 
 struct Impled;
 
