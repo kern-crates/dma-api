@@ -17,6 +17,7 @@ impl<T> DCommon<T> {
         unsafe {
             let addr = NonNull::new(alloc::alloc::alloc_zeroed(layout))?;
             let bus_addr = map(addr, layout.size(), direction);
+            flush(addr, layout.size());
             Some(Self {
                 bus_addr,
                 addr: addr.cast(),
