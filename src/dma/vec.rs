@@ -1,4 +1,4 @@
-use core::alloc::Layout;
+use core::{alloc::Layout, ops::Deref};
 
 use crate::Direction;
 
@@ -9,6 +9,8 @@ pub struct DVec<T> {
 }
 
 impl<T> DVec<T> {
+    const T_SIZE: usize = size_of::<T>();
+
     pub fn zeros(len: usize, align: usize, direction: Direction) -> Option<Self> {
         let size = len * size_of::<T>();
         let layout = Layout::from_size_align(size, align).unwrap();
@@ -37,7 +39,7 @@ impl<T> DVec<T> {
         unsafe {
             let ptr = self.inner.addr.add(index);
 
-            self.inner.preper_read(ptr);
+            self.inner.preper_read(ptr, Self::T_SIZE);
 
             Some(ptr.read_volatile())
         }
@@ -53,7 +55,17 @@ impl<T> DVec<T> {
 
             ptr.write_volatile(value);
 
-            self.inner.preper_write(ptr);
+            self.inner.preper_write(ptr, Self::T_SIZE);
         }
+    }
+}
+
+impl<T> Deref for DVec<T> {
+    type Target = [T];
+
+    fn deref(&self) -> &Self::Target {
+        self.inner
+            .preper_read(self.inner.addr, Self::T_SIZE * self.len());
+        unsafe { core::slice::from_raw_parts(self.inner.addr.as_ptr(), self.len()) }
     }
 }

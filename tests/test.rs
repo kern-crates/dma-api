@@ -36,6 +36,17 @@ fn test_modify() {
     assert_eq!(dma.read(), Foo { foo: 0, bar: 1 });
 }
 
+#[test]
+fn test_deref() {
+    let mut dma: DVec<u32> = DVec::zeros(10, 0x1000, Direction::FromDevice).unwrap();
+
+    dma.set(0, 1);
+
+    let foo = &dma;
+
+    assert_eq!(foo[0], 1);
+}
+
 struct Impled;
 
 impl Impl for Impled {

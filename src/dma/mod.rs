@@ -26,21 +26,21 @@ impl<T> DCommon<T> {
         }
     }
 
-    pub fn preper_read(&self, ptr: NonNull<T>) {
+    pub fn preper_read(&self, ptr: NonNull<T>, size: usize) {
         if matches!(
             self.direction,
             Direction::FromDevice | Direction::Bidirectional
         ) {
-            invalidate(ptr.cast(), size_of::<T>() / size_of::<u8>());
+            invalidate(ptr.cast(), size);
         }
     }
 
-    pub fn preper_write(&self, ptr: NonNull<T>) {
+    pub fn preper_write(&self, ptr: NonNull<T>, size: usize) {
         if matches!(
             self.direction,
             Direction::ToDevice | Direction::Bidirectional
         ) {
-            flush(ptr.cast(), size_of::<T>() / size_of::<u8>())
+            flush(ptr.cast(), size)
         }
     }
 }

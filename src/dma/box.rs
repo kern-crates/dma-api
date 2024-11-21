@@ -9,6 +9,8 @@ pub struct DBox<T> {
 }
 
 impl<T> DBox<T> {
+    const SIZE: usize = size_of::<T>();
+
     pub fn zero(direction: Direction) -> Option<Self> {
         let layout = Layout::new::<T>();
 
@@ -24,7 +26,7 @@ impl<T> DBox<T> {
         unsafe {
             let ptr = self.inner.addr;
 
-            self.inner.preper_read(ptr);
+            self.inner.preper_read(ptr, Self::SIZE);
 
             ptr.read_volatile()
         }
@@ -36,7 +38,7 @@ impl<T> DBox<T> {
 
             ptr.write_volatile(value);
 
-            self.inner.preper_write(ptr);
+            self.inner.preper_write(ptr, Self::SIZE);
         }
     }
 
@@ -44,11 +46,11 @@ impl<T> DBox<T> {
         unsafe {
             let mut ptr = self.inner.addr;
 
-            self.inner.preper_read(ptr);
+            self.inner.preper_read(ptr, Self::SIZE);
 
             f(ptr.as_mut());
 
-            self.inner.preper_write(ptr);
+            self.inner.preper_write(ptr, Self::SIZE);
         }
     }
 }
