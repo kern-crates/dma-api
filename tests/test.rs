@@ -47,6 +47,16 @@ fn test_deref() {
     assert_eq!(foo[0], 1);
 }
 
+#[test]
+fn test_copy() {
+    let mut dma: DVec<u32> = DVec::zeros(0x40, 0x1000, Direction::ToDevice).unwrap();
+    let src = [1u32; 0x40];
+
+    dma.copy_from_slice(&src);
+
+    assert!(dma.eq(&src));
+}
+
 struct Impled;
 
 impl Impl for Impled {

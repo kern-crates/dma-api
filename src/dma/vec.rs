@@ -58,6 +58,21 @@ impl<T> DVec<T> {
             self.inner.preper_write(ptr, Self::T_SIZE);
         }
     }
+
+    fn as_slice_mut(&mut self) -> &mut [T] {
+        unsafe { core::slice::from_raw_parts_mut(self.inner.addr.as_ptr(), self.len()) }
+    }
+}
+
+impl<T: Copy> DVec<T> {
+    pub fn copy_from_slice(&mut self, src: &[T]) {
+        assert!(src.len() <= self.len());
+
+        self.as_slice_mut().copy_from_slice(src);
+
+        self.inner
+            .preper_write(self.inner.addr, Self::T_SIZE * src.len());
+    }
 }
 
 impl<T> Deref for DVec<T> {
