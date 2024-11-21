@@ -38,7 +38,7 @@ impl<T> DBox<T> {
 
             ptr.write_volatile(value);
 
-            self.inner.preper_write(ptr, Self::SIZE);
+            self.inner.confirm_write(ptr, Self::SIZE);
         }
     }
 
@@ -50,7 +50,7 @@ impl<T> DBox<T> {
 
             f(ptr.as_mut());
 
-            self.inner.preper_write(ptr, Self::SIZE);
+            self.inner.confirm_write(ptr, Self::SIZE);
         }
     }
 }

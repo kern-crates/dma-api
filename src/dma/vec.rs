@@ -55,7 +55,7 @@ impl<T> DVec<T> {
 
             ptr.write_volatile(value);
 
-            self.inner.preper_write(ptr, Self::T_SIZE);
+            self.inner.confirm_write(ptr, Self::T_SIZE);
         }
     }
 
@@ -71,7 +71,7 @@ impl<T: Copy> DVec<T> {
         self.as_slice_mut().copy_from_slice(src);
 
         self.inner
-            .preper_write(self.inner.addr, Self::T_SIZE * src.len());
+            .confirm_write(self.inner.addr, Self::T_SIZE * src.len());
     }
 }
 

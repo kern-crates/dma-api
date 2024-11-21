@@ -36,7 +36,7 @@ impl<T> DCommon<T> {
         }
     }
 
-    pub fn preper_write(&self, ptr: NonNull<T>, size: usize) {
+    pub fn confirm_write(&self, ptr: NonNull<T>, size: usize) {
         if matches!(
             self.direction,
             Direction::ToDevice | Direction::Bidirectional
