@@ -26,7 +26,7 @@ impl<T> DBox<T> {
         unsafe {
             let ptr = self.inner.addr;
 
-            self.inner.preper_read(ptr, Self::SIZE);
+            self.inner.preper_read(ptr.cast(), Self::SIZE);
 
             ptr.read_volatile()
         }
@@ -38,7 +38,7 @@ impl<T> DBox<T> {
 
             ptr.write_volatile(value);
 
-            self.inner.confirm_write(ptr, Self::SIZE);
+            self.inner.confirm_write(ptr.cast(), Self::SIZE);
         }
     }
 
@@ -46,11 +46,11 @@ impl<T> DBox<T> {
         unsafe {
             let mut ptr = self.inner.addr;
 
-            self.inner.preper_read(ptr, Self::SIZE);
+            self.inner.preper_read(ptr.cast(), Self::SIZE);
 
             f(ptr.as_mut());
 
-            self.inner.confirm_write(ptr, Self::SIZE);
+            self.inner.confirm_write(ptr.cast(), Self::SIZE);
         }
     }
 }

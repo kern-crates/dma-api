@@ -1,6 +1,10 @@
-use core::{alloc::Layout, ops::Deref};
+use alloc::vec::Vec;
+use core::{
+    alloc::Layout,
+    ops::{Deref, Index},
+};
 
-use crate::Direction;
+use crate::{unmap, Direction};
 
 use super::DCommon;
 
@@ -19,6 +23,25 @@ impl<T> DVec<T> {
             inner: DCommon::zeros(layout, direction)?,
         })
     }
+
+    pub fn from_vec(value: Vec<T>, direction: Direction) -> Self {
+        Self {
+            inner: DCommon::from_vec(value, direction),
+        }
+    }
+
+    pub fn to_vec(mut self) -> Vec<T> {
+        unsafe {
+            self.inner
+                .preper_read(self.inner.addr.cast(), self.inner.layout.size());
+            unmap(self.inner.addr.cast(), self.inner.layout.size());
+            let len = self.len();
+
+            self.inner.layout = Layout::from_size_align_unchecked(0, 0x1000);
+            Vec::from_raw_parts(self.inner.addr.as_ptr(), len, len)
+        }
+    }
+
     pub fn len(&self) -> usize {
         self.inner.layout.size() / size_of::<T>()
     }
@@ -39,28 +62,40 @@ impl<T> DVec<T> {
         unsafe {
             let ptr = self.inner.addr.add(index);
 
-            self.inner.preper_read(ptr, Self::T_SIZE);
+            self.inner.preper_read(ptr.cast(), Self::T_SIZE);
 
             Some(ptr.read_volatile())
         }
     }
 
     pub fn set(&mut self, index: usize, value: T) {
-        if index >= self.len() {
-            return;
-        }
+        assert!(index < self.len());
 
         unsafe {
             let ptr = self.inner.addr.add(index);
 
             ptr.write_volatile(value);
 
-            self.inner.confirm_write(ptr, Self::T_SIZE);
+            self.inner.confirm_write(ptr.cast(), Self::T_SIZE);
         }
     }
 
     fn as_slice_mut(&mut self) -> &mut [T] {
         unsafe { core::slice::from_raw_parts_mut(self.inner.addr.as_ptr(), self.len()) }
+    }
+}
+
+impl<T> Index<usize> for DVec<T> {
+    type Output = T;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        assert!(index < self.len());
+
+        let ptr = unsafe { self.inner.addr.add(index) };
+
+        self.inner.preper_read(ptr.cast(), Self::T_SIZE);
+
+        unsafe { &*ptr.as_ptr() }
     }
 }
 
@@ -71,7 +106,7 @@ impl<T: Copy> DVec<T> {
         self.as_slice_mut().copy_from_slice(src);
 
         self.inner
-            .confirm_write(self.inner.addr, Self::T_SIZE * src.len());
+            .confirm_write(self.inner.addr.cast(), Self::T_SIZE * src.len());
     }
 }
 
@@ -80,7 +115,7 @@ impl<T> Deref for DVec<T> {
 
     fn deref(&self) -> &Self::Target {
         self.inner
-            .preper_read(self.inner.addr, Self::T_SIZE * self.len());
+            .preper_read(self.inner.addr.cast(), Self::T_SIZE * self.len());
         unsafe { core::slice::from_raw_parts(self.inner.addr.as_ptr(), self.len()) }
     }
 }

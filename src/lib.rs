@@ -8,6 +8,7 @@ use core::ptr::NonNull;
 mod dma;
 
 pub use dma::r#box::DBox;
+pub use dma::slice::{DSlice, DSliceMut};
 pub use dma::vec::DVec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

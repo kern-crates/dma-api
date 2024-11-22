@@ -49,12 +49,68 @@ fn test_deref() {
 
 #[test]
 fn test_copy() {
-    let mut dma: DVec<u32> = DVec::zeros(0x40, 0x1000, Direction::ToDevice).unwrap();
+    let mut dma: DVec<u32> = DVec::zeros(0x40, 0x1000, Direction::Bidirectional).unwrap();
+
+    println!("new dma ok");
+
     let src = [1u32; 0x40];
 
     dma.copy_from_slice(&src);
 
+    println!("copy ok");
+
     assert!(dma.eq(&src));
+}
+
+#[test]
+fn test_index() {
+    let dma: DVec<u32> = DVec::zeros(0x40, 0x1000, Direction::Bidirectional).unwrap();
+
+    println!("new dma ok");
+
+    let a = dma[0];
+
+    assert_eq!(a, 0);
+}
+
+#[test]
+fn test_slice() {
+    let src = [1u32; 0x40];
+    let dma = DSlice::from(src.as_ref());
+
+    assert!(dma.eq(&src));
+}
+
+#[test]
+fn test_slice_index() {
+    let src = [1u32; 0x40];
+    let dma = DSlice::from(src.as_ref());
+
+    assert_eq!(dma[1], 1);
+}
+
+#[test]
+fn test_slice_mut() {
+    let mut src = [1u32; 0x40];
+    let dma = DSliceMut::from(src.as_mut(), Direction::Bidirectional);
+
+    dma.set(0, 2);
+
+    assert_eq!(dma[0], 2);
+}
+
+#[test]
+fn test_from_vec() {
+    let value = vec![1, 2, 3];
+    let dma = DVec::from_vec(value, Direction::FromDevice);
+
+    assert_eq!(dma[1], 2);
+
+    let v = dma.to_vec();
+
+    println!("to vec");
+
+    assert_eq!(v, vec![1, 2, 3]);
 }
 
 struct Impled;
