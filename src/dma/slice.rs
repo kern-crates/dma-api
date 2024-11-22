@@ -61,6 +61,10 @@ impl<'a, T> DSliceMut<'a, T> {
         }
     }
 
+    pub fn bus_addr(&self) -> u64 {
+        self.inner.bus_addr
+    }
+
     pub fn len(&self) -> usize {
         self.inner.len()
     }
