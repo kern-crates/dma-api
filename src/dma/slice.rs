@@ -86,6 +86,10 @@ impl<'a, T> DSliceMut<'a, T> {
                 .confirm_write(ptr.cast(), size_of::<T>());
         }
     }
+
+    pub fn preper_read_all(&self) {
+        self.inner.preper_read_all();
+    }
 }
 
 impl<'a, T> Index<usize> for DSliceMut<'a, T> {
@@ -141,6 +145,10 @@ impl<'a, T> DSliceCommon<'a, T> {
         self.direction.preper_read(ptr.cast(), size_of::<T>());
 
         unsafe { ptr.as_ref() }
+    }
+
+    fn preper_read_all(&self) {
+        self.direction.preper_read(self.addr.cast(), self.size);
     }
 }
 
