@@ -2,7 +2,7 @@ use crate::{flush, invalidate, map, unmap, Direction};
 use alloc::vec::Vec;
 use core::{
     alloc::Layout,
-    mem::{self, size_of},
+    mem::{self, align_of, size_of},
     ptr::NonNull,
 };
 
