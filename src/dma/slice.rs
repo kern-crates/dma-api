@@ -1,5 +1,6 @@
 use core::{
     marker::PhantomData,
+    mem::{size_of, size_of_val},
     ops::{Deref, Index},
     ptr::{slice_from_raw_parts, NonNull},
 };

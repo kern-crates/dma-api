@@ -1,6 +1,7 @@
 use alloc::vec::Vec;
 use core::{
     alloc::Layout,
+    mem::size_of,
     ops::{Deref, Index},
 };
 

@@ -9,7 +9,7 @@ pub struct DBox<T> {
 }
 
 impl<T> DBox<T> {
-    const SIZE: usize = size_of::<T>();
+    const SIZE: usize = core::mem::size_of::<T>();
 
     pub fn zero(direction: Direction) -> Option<Self> {
         let layout = Layout::new::<T>();

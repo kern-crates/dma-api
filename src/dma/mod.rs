@@ -1,6 +1,10 @@
 use crate::{flush, invalidate, map, unmap, Direction};
 use alloc::vec::Vec;
-use core::{alloc::Layout, mem, ptr::NonNull};
+use core::{
+    alloc::Layout,
+    mem::{self, size_of},
+    ptr::NonNull,
+};
 
 pub mod r#box;
 pub mod slice;
