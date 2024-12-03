@@ -70,7 +70,12 @@ impl<T> DVec<T> {
     }
 
     pub fn set(&mut self, index: usize, value: T) {
-        assert!(index < self.len());
+        assert!(
+            index < self.len(),
+            "index out of range, index: {},len: {}",
+            index,
+            self.len()
+        );
 
         unsafe {
             let ptr = self.inner.addr.add(index);
