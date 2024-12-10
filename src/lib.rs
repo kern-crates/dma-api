@@ -1,15 +1,16 @@
 #![cfg_attr(not(test), no_std)]
 #![doc = include_str!("../README.md")]
 
+#[cfg(feature = "alloc")]
 extern crate alloc;
 
 use core::ptr::NonNull;
 
 mod dma;
 
-pub use dma::r#box::DBox;
+#[cfg(feature = "alloc")]
+pub use dma::alloc::{r#box::DBox, vec::DVec};
 pub use dma::slice::{DSlice, DSliceMut};
-pub use dma::vec::DVec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Direction {
