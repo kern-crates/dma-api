@@ -11,7 +11,9 @@ pub struct DBox<T> {
 impl<T> DBox<T> {
     const SIZE: usize = core::mem::size_of::<T>();
 
-    pub fn zero_with_layout(direction: Direction, layout: Layout) -> Option<Self> {
+    pub fn zero_with_align(direction: Direction, align: usize) -> Option<Self> {
+        let layout = Layout::from_size_align(Self::SIZE, align).ok()?;
+
         Some(Self {
             inner: DCommon::zeros(layout, direction)?,
         })
@@ -19,7 +21,9 @@ impl<T> DBox<T> {
 
     pub fn zero(direction: Direction) -> Option<Self> {
         let layout = Layout::new::<T>();
-        Self::zero_with_layout(direction, layout)
+        Some(Self {
+            inner: DCommon::zeros(layout, direction)?,
+        })
     }
     pub fn bus_addr(&self) -> u64 {
         self.inner.bus_addr
