@@ -11,12 +11,15 @@ pub struct DBox<T> {
 impl<T> DBox<T> {
     const SIZE: usize = core::mem::size_of::<T>();
 
-    pub fn zero(direction: Direction) -> Option<Self> {
-        let layout = Layout::new::<T>();
-
+    pub fn zero_with_layout(direction: Direction, layout: Layout) -> Option<Self> {
         Some(Self {
             inner: DCommon::zeros(layout, direction)?,
         })
+    }
+
+    pub fn zero(direction: Direction) -> Option<Self> {
+        let layout = Layout::new::<T>();
+        Self::zero_with_layout(direction, layout)
     }
     pub fn bus_addr(&self) -> u64 {
         self.inner.bus_addr

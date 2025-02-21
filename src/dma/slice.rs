@@ -12,7 +12,7 @@ pub struct DSlice<'a, T> {
     inner: DSliceCommon<'a, T>,
 }
 
-impl<'a, T> DSlice<'a, T> {
+impl<T> DSlice<'_, T> {
     pub fn len(&self) -> usize {
         self.inner.len()
     }
@@ -34,7 +34,7 @@ impl<'a, T> From<&'a [T]> for DSlice<'a, T> {
     }
 }
 
-impl<'a, T> Index<usize> for DSlice<'a, T> {
+impl<T> Index<usize> for DSlice<'_, T> {
     type Output = T;
 
     fn index(&self, index: usize) -> &Self::Output {
@@ -42,7 +42,7 @@ impl<'a, T> Index<usize> for DSlice<'a, T> {
     }
 }
 
-impl<'a, T> Deref for DSlice<'a, T> {
+impl<T> Deref for DSlice<'_, T> {
     type Target = [T];
 
     fn deref(&self) -> &Self::Target {
@@ -93,7 +93,7 @@ impl<'a, T> DSliceMut<'a, T> {
     }
 }
 
-impl<'a, T> Index<usize> for DSliceMut<'a, T> {
+impl<T> Index<usize> for DSliceMut<'_, T> {
     type Output = T;
 
     fn index(&self, index: usize) -> &Self::Output {
@@ -101,7 +101,7 @@ impl<'a, T> Index<usize> for DSliceMut<'a, T> {
     }
 }
 
-impl<'a, T> Deref for DSliceMut<'a, T> {
+impl<T> Deref for DSliceMut<'_, T> {
     type Target = [T];
 
     fn deref(&self) -> &Self::Target {
@@ -159,7 +159,7 @@ impl<T> Drop for DSliceCommon<'_, T> {
     }
 }
 
-impl<'a, T> Deref for DSliceCommon<'a, T> {
+impl<T> Deref for DSliceCommon<'_, T> {
     type Target = [T];
 
     fn deref(&self) -> &Self::Target {
