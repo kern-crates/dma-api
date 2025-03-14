@@ -1,3 +1,4 @@
+#[cfg(feature = "alloc")]
 use alloc::vec::Vec;
 use core::{
     alloc::Layout,
@@ -5,9 +6,8 @@ use core::{
     ops::{Deref, Index},
 };
 
-use crate::{unmap, Direction};
-
 use super::DCommon;
+use crate::Direction;
 
 pub struct DVec<T> {
     inner: DCommon<T>,
@@ -25,17 +25,19 @@ impl<T> DVec<T> {
         })
     }
 
+    #[cfg(feature = "alloc")]
     pub fn from_vec(value: Vec<T>, direction: Direction) -> Self {
         Self {
             inner: DCommon::from_vec(value, direction),
         }
     }
 
+    #[cfg(feature = "alloc")]
     pub fn to_vec(mut self) -> Vec<T> {
         unsafe {
             self.inner
                 .preper_read(self.inner.addr.cast(), self.inner.layout.size());
-            unmap(self.inner.addr.cast(), self.inner.layout.size());
+            crate::unmap(self.inner.addr.cast(), self.inner.layout.size());
             let len = self.len();
 
             self.inner.layout = Layout::from_size_align_unchecked(0, 0x1000);

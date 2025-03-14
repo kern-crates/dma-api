@@ -1,5 +1,9 @@
+#[cfg(feature = "alloc")]
 use alloc::vec::Vec;
-use core::{alloc::Layout, mem, ptr::NonNull};
+use core::{
+    alloc::Layout,
+    ptr::{slice_from_raw_parts_mut, NonNull},
+};
 
 use crate::{flush, map, unmap, Direction};
 
@@ -16,7 +20,9 @@ struct DCommon<T> {
 impl<T> DCommon<T> {
     pub fn zeros(layout: Layout, direction: Direction) -> Option<Self> {
         unsafe {
-            let addr = NonNull::new(alloc::alloc::alloc_zeroed(layout))?;
+            let mut addr = NonNull::new(crate::alloc(layout))?;
+            (*slice_from_raw_parts_mut(addr.as_mut(), layout.size())).fill(0);
+
             let bus_addr = map(addr, layout.size(), direction);
             flush(addr, layout.size());
             Some(Self {
@@ -28,6 +34,7 @@ impl<T> DCommon<T> {
         }
     }
 
+    #[cfg(feature = "alloc")]
     pub fn from_vec(mut value: Vec<T>, direction: Direction) -> Self {
         unsafe {
             let layout = Layout::from_size_align_unchecked(
@@ -37,7 +44,7 @@ impl<T> DCommon<T> {
 
             let addr = NonNull::new(value.as_mut_ptr()).unwrap();
 
-            mem::forget(value);
+            core::mem::forget(value);
 
             let bus_addr = map(addr.cast(), layout.size(), direction);
             flush(addr.cast(), layout.size());
@@ -64,7 +71,7 @@ impl<T> Drop for DCommon<T> {
         if self.layout.size() > 0 {
             unmap(self.addr.cast(), self.layout.size());
 
-            unsafe { alloc::alloc::dealloc(self.addr.as_ptr() as _, self.layout) };
+            unsafe { crate::dealloc(self.addr.as_ptr() as _, self.layout) };
         }
     }
 }

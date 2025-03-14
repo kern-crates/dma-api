@@ -91,6 +91,12 @@ impl<'a, T> DSliceMut<'a, T> {
     pub fn preper_read_all(&self) {
         self.inner.preper_read_all();
     }
+
+    pub fn preper_write_all(&self) {
+        self.inner
+            .direction
+            .confirm_write(self.inner.addr.cast(), self.inner.size);
+    }
 }
 
 impl<T> Index<usize> for DSliceMut<'_, T> {

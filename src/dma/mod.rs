@@ -2,8 +2,6 @@ use crate::{flush, invalidate, Direction};
 use core::ptr::NonNull;
 
 pub mod slice;
-
-#[cfg(feature = "alloc")]
 pub mod alloc;
 
 impl Direction {
