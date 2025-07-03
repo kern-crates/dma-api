@@ -1,6 +1,6 @@
 # DMA API
 
-[![Rust](https://github.com/ZR233/dma-api/actions/workflows/rust.yml/badge.svg?branch=main)](https://github.com/ZR233/dma-api/actions/workflows/rust.yml)
+[![Rust](https://github.com/drivercraft/dma-api/actions/workflows/rust.yml/badge.svg?branch=main)](https://github.com/drivercraft/dma-api/actions/workflows/rust.yml)
 
 ## Example
 

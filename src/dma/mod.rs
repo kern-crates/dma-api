@@ -1,8 +1,9 @@
 use crate::{flush, invalidate, Direction};
 use core::ptr::NonNull;
 
-pub mod slice;
+#[cfg(feature = "alloc")]
 pub mod alloc;
+pub mod slice;
 
 impl Direction {
     pub fn preper_read(self, ptr: NonNull<u8>, size: usize) {

@@ -1,4 +1,3 @@
-#[cfg(feature = "alloc")]
 use alloc::vec::Vec;
 use core::{
     alloc::Layout,
@@ -34,7 +33,6 @@ impl<T> DCommon<T> {
         }
     }
 
-    #[cfg(feature = "alloc")]
     pub fn from_vec(mut value: Vec<T>, direction: Direction) -> Self {
         unsafe {
             let layout = Layout::from_size_align_unchecked(
