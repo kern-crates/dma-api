@@ -24,6 +24,10 @@ impl<T> DSlice<'_, T> {
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
+
+    pub fn preper_read_all(&self) {
+        self.inner.preper_read_all();
+    }
 }
 
 impl<'a, T> From<&'a [T]> for DSlice<'a, T> {
