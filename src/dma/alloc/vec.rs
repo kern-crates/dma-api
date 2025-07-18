@@ -87,6 +87,10 @@ impl<T> DVec<T> {
     fn as_slice_mut(&mut self) -> &mut [T] {
         unsafe { core::slice::from_raw_parts_mut(self.inner.addr.as_ptr(), self.len()) }
     }
+
+    pub fn confirm_write_all(&mut self) {
+        self.inner.confirm_write_all();
+    }
 }
 
 impl<T> Index<usize> for DVec<T> {
@@ -109,15 +113,14 @@ impl<T: Copy> DVec<T> {
 
         self.as_slice_mut().copy_from_slice(src);
 
-        self.inner
-            .confirm_write(self.inner.addr.cast(), Self::T_SIZE * src.len());
+        self.inner.confirm_write_all();
     }
 }
 
 impl<T> AsRef<[T]> for DVec<T> {
     fn as_ref(&self) -> &[T] {
         self.inner
-            .preper_read(self.inner.addr.cast(), Self::T_SIZE * self.len());
+            .preper_read(self.inner.addr.cast(), self.inner.layout.size());
         unsafe { core::slice::from_raw_parts(self.inner.addr.as_ptr(), self.len()) }
     }
 }

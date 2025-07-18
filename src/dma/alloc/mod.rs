@@ -62,6 +62,11 @@ impl<T> DCommon<T> {
     pub fn confirm_write(&self, ptr: NonNull<u8>, size: usize) {
         self.direction.confirm_write(ptr, size);
     }
+
+    pub fn confirm_write_all(&self) {
+        self.direction
+            .confirm_write(self.addr.cast(), self.layout.size());
+    }
 }
 
 impl<T> Drop for DCommon<T> {
