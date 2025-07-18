@@ -88,7 +88,7 @@ impl<T> DVec<T> {
         unsafe { core::slice::from_raw_parts_mut(self.inner.addr.as_ptr(), self.len()) }
     }
 
-    pub fn confirm_write_all(&mut self) {
+    pub fn confirm_write_all(&self) {
         self.inner.confirm_write_all();
     }
 }
