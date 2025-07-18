@@ -1,10 +1,6 @@
 #[cfg(feature = "alloc")]
 use alloc::vec::Vec;
-use core::{
-    alloc::Layout,
-    mem::size_of,
-    ops::{Deref, Index},
-};
+use core::{alloc::Layout, mem::size_of, ops::Index};
 
 use super::DCommon;
 use crate::Direction;
@@ -118,10 +114,8 @@ impl<T: Copy> DVec<T> {
     }
 }
 
-impl<T> Deref for DVec<T> {
-    type Target = [T];
-
-    fn deref(&self) -> &Self::Target {
+impl<T> AsRef<[T]> for DVec<T> {
+    fn as_ref(&self) -> &[T] {
         self.inner
             .preper_read(self.inner.addr.cast(), Self::T_SIZE * self.len());
         unsafe { core::slice::from_raw_parts(self.inner.addr.as_ptr(), self.len()) }
