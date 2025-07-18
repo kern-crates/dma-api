@@ -1,8 +1,8 @@
 use core::{
     marker::PhantomData,
     mem::{size_of, size_of_val},
-    ops::{Deref, Index},
-    ptr::{slice_from_raw_parts, NonNull},
+    ops::Index,
+    ptr::NonNull,
 };
 
 use crate::{flush, map, unmap, Direction};
@@ -12,7 +12,7 @@ pub struct DSlice<'a, T> {
     inner: DSliceCommon<'a, T>,
 }
 
-impl<T> DSlice<'_, T> {
+impl<'a, T> DSlice<'a, T> {
     pub fn len(&self) -> usize {
         self.inner.len()
     }
@@ -24,13 +24,19 @@ impl<T> DSlice<'_, T> {
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
-}
 
-impl<'a, T> From<&'a [T]> for DSlice<'a, T> {
-    fn from(value: &'a [T]) -> Self {
+    pub fn from(value: &'a [T], direction: Direction) -> Self {
         Self {
-            inner: DSliceCommon::new(value, Direction::ToDevice),
+            inner: DSliceCommon::new(value, direction),
         }
+    }
+
+    pub fn preper_read_all(&self) {
+        self.inner.preper_read_all();
+    }
+
+    pub fn confirm_write_all(&self) {
+        self.inner.confirm_write_all();
     }
 }
 
@@ -42,11 +48,9 @@ impl<T> Index<usize> for DSlice<'_, T> {
     }
 }
 
-impl<T> Deref for DSlice<'_, T> {
-    type Target = [T];
-
-    fn deref(&self) -> &Self::Target {
-        &self.inner
+impl<T> AsRef<[T]> for DSlice<'_, T> {
+    fn as_ref(&self) -> &[T] {
+        self.inner.as_ref()
     }
 }
 
@@ -92,10 +96,8 @@ impl<'a, T> DSliceMut<'a, T> {
         self.inner.preper_read_all();
     }
 
-    pub fn preper_write_all(&self) {
-        self.inner
-            .direction
-            .confirm_write(self.inner.addr.cast(), self.inner.size);
+    pub fn confirm_write_all(&self) {
+        self.inner.confirm_write_all();
     }
 }
 
@@ -107,11 +109,9 @@ impl<T> Index<usize> for DSliceMut<'_, T> {
     }
 }
 
-impl<T> Deref for DSliceMut<'_, T> {
-    type Target = [T];
-
-    fn deref(&self) -> &Self::Target {
-        &self.inner
+impl<T> AsRef<[T]> for DSliceMut<'_, T> {
+    fn as_ref(&self) -> &[T] {
+        self.inner.as_ref()
     }
 }
 
@@ -155,7 +155,13 @@ impl<'a, T> DSliceCommon<'a, T> {
     }
 
     fn preper_read_all(&self) {
-        self.direction.preper_read(self.addr.cast(), self.size);
+        self.direction
+            .preper_read(self.addr.cast(), self.size * size_of::<T>());
+    }
+
+    fn confirm_write_all(&self) {
+        self.direction
+            .confirm_write(self.addr.cast(), self.size * size_of::<T>());
     }
 }
 
@@ -165,11 +171,9 @@ impl<T> Drop for DSliceCommon<'_, T> {
     }
 }
 
-impl<T> Deref for DSliceCommon<'_, T> {
-    type Target = [T];
-
-    fn deref(&self) -> &Self::Target {
-        self.direction.preper_read(self.addr.cast(), self.size);
-        unsafe { &*slice_from_raw_parts(self.addr.as_ptr(), self.len()) }
+impl<T> AsRef<[T]> for DSliceCommon<'_, T> {
+    fn as_ref(&self) -> &[T] {
+        self.preper_read_all();
+        unsafe { core::slice::from_raw_parts_mut(self.addr.as_ptr(), self.len()) }
     }
 }
