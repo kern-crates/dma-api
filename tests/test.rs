@@ -59,7 +59,9 @@ fn test_copy() {
 
     println!("copy ok");
 
-    assert!(dma.eq(&src));
+    for (i, &v) in src.iter().enumerate() {
+        assert_eq!(dma[i], v);
+    }
 }
 
 #[test]
@@ -76,15 +78,19 @@ fn test_index() {
 #[test]
 fn test_slice() {
     let src = [1u32; 0x40];
-    let dma = DSlice::from(src.as_ref());
+    let dma = DSlice::from(src.as_ref(), Direction::Bidirectional);
 
-    assert!(dma.eq(&src));
+    assert_eq!(dma.len(), src.len());
+
+    for (i, &v) in src.iter().enumerate() {
+        assert_eq!(dma[i], v);
+    }
 }
 
 #[test]
 fn test_slice_index() {
     let src = [1u32; 0x40];
-    let dma = DSlice::from(src.as_ref());
+    let dma = DSlice::from(src.as_ref(), Direction::Bidirectional);
 
     assert_eq!(dma[1], 1);
 }
