@@ -3,7 +3,7 @@ use alloc::vec::Vec;
 use core::{alloc::Layout, mem::size_of, ops::Index};
 
 use super::DCommon;
-use crate::Direction;
+use crate::{dma::alloc::DError, Direction};
 
 pub struct DVec<T> {
     inner: DCommon<T>,
@@ -12,23 +12,26 @@ pub struct DVec<T> {
 impl<T> DVec<T> {
     const T_SIZE: usize = size_of::<T>();
 
-    pub fn zeros(len: usize, align: usize, direction: Direction) -> Option<Self> {
+    pub fn zeros(
+        dma_mask: u64,
+        len: usize,
+        align: usize,
+        direction: Direction,
+    ) -> Result<Self, DError> {
         let size = len * size_of::<T>();
-        let layout = Layout::from_size_align(size, align).unwrap();
+        let layout = Layout::from_size_align(size, align)?;
 
-        Some(Self {
-            inner: DCommon::zeros(layout, direction)?,
+        Ok(Self {
+            inner: DCommon::zeros(dma_mask, layout, direction)?,
         })
     }
 
-    #[cfg(feature = "alloc")]
-    pub fn from_vec(value: Vec<T>, direction: Direction) -> Self {
-        Self {
-            inner: DCommon::from_vec(value, direction),
-        }
+    pub fn from_vec(dma_mask: u64, value: Vec<T>, direction: Direction) -> Result<Self, DError> {
+        Ok(Self {
+            inner: DCommon::from_vec(dma_mask, value, direction)?,
+        })
     }
 
-    #[cfg(feature = "alloc")]
     pub fn to_vec(mut self) -> Vec<T> {
         unsafe {
             self.inner

@@ -7,10 +7,47 @@
 ```rust
 use dma_api::*;
 
+
+
+
+// ----- OS Side -----
+
+init(&Impled);
+
+struct Impled;
+
+impl Osal for Impled {
+
+    fn map(&self, addr: std::ptr::NonNull<u8>, size: usize, direction: Direction) -> u64 {
+        /// your virtual to physical mapping code here.
+        println!("map @{:?}, size {size:#x}, {direction:?}", addr);
+        addr.as_ptr() as usize as _
+    }
+
+    fn unmap(&self, addr: std::ptr::NonNull<u8>, size: usize) {
+        println!("unmap @{:?}, size {size:#x}", addr);
+    }
+
+    fn flush(&self, addr: std::ptr::NonNull<u8>, size: usize) {
+        /// flush cache to memory
+        println!("flush @{:?}, size {size:#x}", addr);
+    }
+
+    fn invalidate(&self, addr: std::ptr::NonNull<u8>, size: usize) {
+        /// invalidate cache
+        println!("invalidate @{:?}, size {size:#x}", addr);
+    }
+}
+
+// then you can do some thing with the driver.
+
 // ----- Driver Side -----
 
 // use global allocator to alloc `to device` type memory
-let mut dma: DVec<u32> = DVec::zeros(10, 0x1000, Direction::ToDevice).unwrap();
+
+let dma_mask = u64::MAX;
+
+let mut dma: DVec<u32> = DVec::zeros(dma_mask, 10, 0x1000, Direction::ToDevice).unwrap();
 // flush cache to memory.
 dma.set(0, 1);
 
@@ -19,31 +56,4 @@ let o = dma.get(0).unwrap();
 
 assert_eq!(o, 1);
 
-
-// ----- OS Side -----
-
-struct Impled;
-
-impl Impl for Impled {
-    fn map(addr: std::ptr::NonNull<u8>, size: usize, direction: Direction) -> u64 {
-        println!("map @{:?}, size {size:#x}, {direction:?}", addr);
-        addr.as_ptr() as usize as _
-    }
-
-    fn unmap(addr: std::ptr::NonNull<u8>, size: usize) {
-        println!("unmap @{:?}, size {size:#x}", addr);
-    }
-
-    fn flush(addr: std::ptr::NonNull<u8>, size: usize) {
-        println!("flush @{:?}, size {size:#x}", addr);
-    }
-
-    fn invalidate(addr: std::ptr::NonNull<u8>, size: usize) {
-        println!("invalidate @{:?}, size {size:#x}", addr);
-    }
-}
-
-set_impl!(Impled);
-
-// then you can do some thing with the driver.
 ```

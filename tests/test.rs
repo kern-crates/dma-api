@@ -2,7 +2,9 @@ use dma_api::*;
 
 #[test]
 fn test_read() {
-    let mut dma: DVec<u32> = DVec::zeros(10, 0x1000, Direction::FromDevice).unwrap();
+    init(&Impled);
+
+    let mut dma: DVec<u32> = DVec::zeros(u64::MAX, 10, 0x1000, Direction::FromDevice).unwrap();
 
     dma.set(0, 1);
 
@@ -13,7 +15,9 @@ fn test_read() {
 
 #[test]
 fn test_write() {
-    let mut dma: DVec<u32> = DVec::zeros(10, 0x1000, Direction::ToDevice).unwrap();
+    init(&Impled);
+
+    let mut dma: DVec<u32> = DVec::zeros(u64::MAX, 10, 0x1000, Direction::ToDevice).unwrap();
 
     dma.set(0, 1);
 
@@ -29,7 +33,8 @@ struct Foo {
 
 #[test]
 fn test_modify() {
-    let mut dma: DBox<Foo> = DBox::zero(Direction::Bidirectional).unwrap();
+    init(&Impled);
+    let mut dma: DBox<Foo> = DBox::zero(u64::MAX, Direction::Bidirectional).unwrap();
 
     dma.modify(|f| f.bar = 1);
 
@@ -38,7 +43,8 @@ fn test_modify() {
 
 #[test]
 fn test_deref() {
-    let mut dma: DVec<u32> = DVec::zeros(10, 0x1000, Direction::FromDevice).unwrap();
+    init(&Impled);
+    let mut dma: DVec<u32> = DVec::zeros(u64::MAX, 10, 0x1000, Direction::FromDevice).unwrap();
 
     dma.set(0, 1);
 
@@ -49,7 +55,8 @@ fn test_deref() {
 
 #[test]
 fn test_copy() {
-    let mut dma: DVec<u32> = DVec::zeros(0x40, 0x1000, Direction::Bidirectional).unwrap();
+    init(&Impled);
+    let mut dma: DVec<u32> = DVec::zeros(u64::MAX, 0x40, 0x1000, Direction::Bidirectional).unwrap();
 
     println!("new dma ok");
 
@@ -66,7 +73,8 @@ fn test_copy() {
 
 #[test]
 fn test_index() {
-    let dma: DVec<u32> = DVec::zeros(0x40, 0x1000, Direction::Bidirectional).unwrap();
+    init(&Impled);
+    let dma: DVec<u32> = DVec::zeros(u64::MAX, 0x40, 0x1000, Direction::Bidirectional).unwrap();
 
     println!("new dma ok");
 
@@ -77,6 +85,7 @@ fn test_index() {
 
 #[test]
 fn test_slice() {
+    init(&Impled);
     let src = [1u32; 0x40];
     let dma = DSlice::from(src.as_ref(), Direction::Bidirectional);
 
@@ -89,6 +98,7 @@ fn test_slice() {
 
 #[test]
 fn test_slice_index() {
+    init(&Impled);
     let src = [1u32; 0x40];
     let dma = DSlice::from(src.as_ref(), Direction::Bidirectional);
 
@@ -97,6 +107,7 @@ fn test_slice_index() {
 
 #[test]
 fn test_slice_mut() {
+    init(&Impled);
     let mut src = [1u32; 0x40];
     let dma = DSliceMut::from(src.as_mut(), Direction::Bidirectional);
 
@@ -107,8 +118,9 @@ fn test_slice_mut() {
 
 #[test]
 fn test_from_vec() {
+    init(&Impled);
     let value = vec![1, 2, 3];
-    let dma = DVec::from_vec(value, Direction::FromDevice);
+    let dma = DVec::from_vec(u64::MAX, value, Direction::FromDevice).unwrap();
 
     assert_eq!(dma[1], 2);
 
@@ -121,23 +133,21 @@ fn test_from_vec() {
 
 struct Impled;
 
-impl Impl for Impled {
-    fn map(addr: std::ptr::NonNull<u8>, size: usize, direction: Direction) -> u64 {
+impl Osal for Impled {
+    fn map(&self, addr: std::ptr::NonNull<u8>, size: usize, direction: Direction) -> u64 {
         println!("map @{:?}, size {size:#x}, {direction:?}", addr);
         addr.as_ptr() as usize as _
     }
 
-    fn unmap(addr: std::ptr::NonNull<u8>, size: usize) {
+    fn unmap(&self, addr: std::ptr::NonNull<u8>, size: usize) {
         println!("unmap @{:?}, size {size:#x}", addr);
     }
 
-    fn flush(addr: std::ptr::NonNull<u8>, size: usize) {
+    fn flush(&self, addr: std::ptr::NonNull<u8>, size: usize) {
         println!("flush @{:?}, size {size:#x}", addr);
     }
 
-    fn invalidate(addr: std::ptr::NonNull<u8>, size: usize) {
+    fn invalidate(&self, addr: std::ptr::NonNull<u8>, size: usize) {
         println!("invalidate @{:?}, size {size:#x}", addr);
     }
 }
-
-set_impl!(Impled);

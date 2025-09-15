@@ -1,6 +1,6 @@
 use core::alloc::Layout;
 
-use crate::Direction;
+use crate::{dma::alloc::DError, Direction};
 
 use super::DCommon;
 
@@ -11,18 +11,22 @@ pub struct DBox<T> {
 impl<T> DBox<T> {
     const SIZE: usize = core::mem::size_of::<T>();
 
-    pub fn zero_with_align(direction: Direction, align: usize) -> Option<Self> {
-        let layout = Layout::from_size_align(Self::SIZE, align).ok()?;
+    pub fn zero_with_align(
+        dma_mask: u64,
+        direction: Direction,
+        align: usize,
+    ) -> Result<Self, super::DError> {
+        let layout = Layout::from_size_align(Self::SIZE, align)?;
 
-        Some(Self {
-            inner: DCommon::zeros(layout, direction)?,
+        Ok(Self {
+            inner: DCommon::zeros(dma_mask, layout, direction)?,
         })
     }
 
-    pub fn zero(direction: Direction) -> Option<Self> {
+    pub fn zero(dma_mask: u64, direction: Direction) -> Result<Self, DError> {
         let layout = Layout::new::<T>();
-        Some(Self {
-            inner: DCommon::zeros(layout, direction)?,
+        Ok(Self {
+            inner: DCommon::zeros(dma_mask, layout, direction)?,
         })
     }
     pub fn bus_addr(&self) -> u64 {
