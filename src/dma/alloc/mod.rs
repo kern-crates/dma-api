@@ -7,6 +7,7 @@ use core::{
 use crate::{flush, map, unmap, Direction};
 
 pub mod r#box;
+pub mod pool;
 pub mod vec;
 
 #[derive(thiserror::Error, Debug, Clone)]
@@ -31,6 +32,8 @@ struct DCommon<T> {
     layout: Layout,
     direction: Direction,
 }
+
+unsafe impl<T: Send> Send for DCommon<T> {}
 
 impl<T> DCommon<T> {
     pub fn zeros(dma_mask: u64, layout: Layout, direction: Direction) -> Result<Self, DError> {

@@ -10,7 +10,7 @@ mod dma;
 mod osal;
 
 #[cfg(feature = "alloc")]
-pub use dma::alloc::{r#box::DBox, vec::DVec};
+pub use dma::alloc::{pool::*, r#box::DBox, vec::DVec, DError};
 
 pub use dma::slice::{DSlice, DSliceMut};
 

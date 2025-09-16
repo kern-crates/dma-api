@@ -94,6 +94,15 @@ impl<T> DVec<T> {
     pub fn confirm_write_all(&self) {
         self.inner.confirm_write_all();
     }
+
+    pub fn as_ptr(&self) -> *mut T {
+        self.inner.addr.as_ptr()
+    }
+
+    pub fn preper_read_all(&self) {
+        self.inner
+            .preper_read(self.inner.addr.cast(), self.inner.layout.size());
+    }
 }
 
 impl<T> Index<usize> for DVec<T> {
