@@ -37,7 +37,7 @@ impl<T> DBox<T> {
         unsafe {
             let ptr = self.inner.addr;
 
-            self.inner.preper_read(ptr.cast(), Self::SIZE);
+            self.inner.prepare_read(ptr.cast(), Self::SIZE);
 
             ptr.read_volatile()
         }
@@ -57,7 +57,7 @@ impl<T> DBox<T> {
         unsafe {
             let mut ptr = self.inner.addr;
 
-            self.inner.preper_read(ptr.cast(), Self::SIZE);
+            self.inner.prepare_read(ptr.cast(), Self::SIZE);
 
             f(ptr.as_mut());
 

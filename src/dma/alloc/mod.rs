@@ -94,8 +94,8 @@ impl<T> DCommon<T> {
         }
     }
 
-    pub fn preper_read(&self, ptr: NonNull<u8>, size: usize) {
-        self.direction.preper_read(ptr, size);
+    pub fn prepare_read(&self, ptr: NonNull<u8>, size: usize) {
+        self.direction.prepare_read(ptr, size);
     }
 
     pub fn confirm_write(&self, ptr: NonNull<u8>, size: usize) {

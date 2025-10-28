@@ -31,8 +31,8 @@ impl<'a, T> DSlice<'a, T> {
         }
     }
 
-    pub fn preper_read_all(&self) {
-        self.inner.preper_read_all();
+    pub fn prepare_read_all(&self) {
+        self.inner.prepare_read_all();
     }
 
     pub fn confirm_write_all(&self) {
@@ -92,8 +92,8 @@ impl<'a, T> DSliceMut<'a, T> {
         }
     }
 
-    pub fn preper_read_all(&self) {
-        self.inner.preper_read_all();
+    pub fn prepare_read_all(&self) {
+        self.inner.prepare_read_all();
     }
 
     pub fn confirm_write_all(&self) {
@@ -149,14 +149,14 @@ impl<'a, T> DSliceCommon<'a, T> {
 
         let ptr = unsafe { self.addr.add(index) };
 
-        self.direction.preper_read(ptr.cast(), size_of::<T>());
+        self.direction.prepare_read(ptr.cast(), size_of::<T>());
 
         unsafe { ptr.as_ref() }
     }
 
-    fn preper_read_all(&self) {
+    fn prepare_read_all(&self) {
         self.direction
-            .preper_read(self.addr.cast(), self.size * size_of::<T>());
+            .prepare_read(self.addr.cast(), self.size * size_of::<T>());
     }
 
     fn confirm_write_all(&self) {
@@ -173,7 +173,7 @@ impl<T> Drop for DSliceCommon<'_, T> {
 
 impl<T> AsRef<[T]> for DSliceCommon<'_, T> {
     fn as_ref(&self) -> &[T] {
-        self.preper_read_all();
+        self.prepare_read_all();
         unsafe { core::slice::from_raw_parts_mut(self.addr.as_ptr(), self.len()) }
     }
 }

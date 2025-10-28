@@ -6,7 +6,7 @@ pub mod alloc;
 pub mod slice;
 
 impl Direction {
-    pub fn preper_read(self, ptr: NonNull<u8>, size: usize) {
+    pub fn prepare_read(self, ptr: NonNull<u8>, size: usize) {
         if matches!(self, Direction::FromDevice | Direction::Bidirectional) {
             invalidate(ptr, size);
         }

@@ -7,9 +7,6 @@
 ```rust
 use dma_api::*;
 
-
-
-
 // ----- OS Side -----
 
 init(&Impled);
@@ -44,16 +41,17 @@ impl Osal for Impled {
 // ----- Driver Side -----
 
 // use global allocator to alloc `to device` type memory
+#[cfg(feature = "alloc")]
+{
+    let dma_mask = u64::MAX;
 
-let dma_mask = u64::MAX;
+    let mut dma: DVec<u32> = DVec::zeros(dma_mask, 10, 0x1000, Direction::ToDevice).unwrap();
+    // flush cache to memory.
+    dma.set(0, 1);
 
-let mut dma: DVec<u32> = DVec::zeros(dma_mask, 10, 0x1000, Direction::ToDevice).unwrap();
-// flush cache to memory.
-dma.set(0, 1);
+    // do nothing with cache
+    let o = dma.get(0).unwrap();
 
-// do nothing with cache
-let o = dma.get(0).unwrap();
-
-assert_eq!(o, 1);
-
+    assert_eq!(o, 1);
+}
 ```

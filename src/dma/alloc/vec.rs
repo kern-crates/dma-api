@@ -35,7 +35,7 @@ impl<T> DVec<T> {
     pub fn to_vec(mut self) -> Vec<T> {
         unsafe {
             self.inner
-                .preper_read(self.inner.addr.cast(), self.inner.layout.size());
+                .prepare_read(self.inner.addr.cast(), self.inner.layout.size());
             crate::unmap(self.inner.addr.cast(), self.inner.layout.size());
             let len = self.len();
 
@@ -64,7 +64,7 @@ impl<T> DVec<T> {
         unsafe {
             let ptr = self.inner.addr.add(index);
 
-            self.inner.preper_read(ptr.cast(), Self::T_SIZE);
+            self.inner.prepare_read(ptr.cast(), Self::T_SIZE);
 
             Some(ptr.read_volatile())
         }
@@ -99,9 +99,9 @@ impl<T> DVec<T> {
         self.inner.addr.as_ptr()
     }
 
-    pub fn preper_read_all(&self) {
+    pub fn prepare_read_all(&self) {
         self.inner
-            .preper_read(self.inner.addr.cast(), self.inner.layout.size());
+            .prepare_read(self.inner.addr.cast(), self.inner.layout.size());
     }
 }
 
@@ -113,7 +113,7 @@ impl<T> Index<usize> for DVec<T> {
 
         let ptr = unsafe { self.inner.addr.add(index) };
 
-        self.inner.preper_read(ptr.cast(), Self::T_SIZE);
+        self.inner.prepare_read(ptr.cast(), Self::T_SIZE);
 
         unsafe { &*ptr.as_ptr() }
     }
@@ -132,7 +132,7 @@ impl<T: Copy> DVec<T> {
 impl<T> AsRef<[T]> for DVec<T> {
     fn as_ref(&self) -> &[T] {
         self.inner
-            .preper_read(self.inner.addr.cast(), self.inner.layout.size());
+            .prepare_read(self.inner.addr.cast(), self.inner.layout.size());
         unsafe { core::slice::from_raw_parts(self.inner.addr.as_ptr(), self.len()) }
     }
 }
